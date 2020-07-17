@@ -143,7 +143,7 @@ class _BluetoothAppState extends State<BluetoothApp> {
       _devicesList = devices;
     });
   }
-
+  String onText;
   // Now, its time to build the UI
   @override
   Widget build(BuildContext context) {
@@ -307,7 +307,9 @@ class _BluetoothAppState extends State<BluetoothApp> {
                                 ),
                                 FlatButton(
                                   onPressed: _connected
-                                      ? _sendOnMessageToBluetooth
+                                      ? (){
+                                    _sendOnMessageToBluetooth("1");
+                                  }
                                       : null,
                                   child: Text("ON"),
                                 ),
@@ -317,11 +319,40 @@ class _BluetoothAppState extends State<BluetoothApp> {
                                       : null,
                                   child: Text("OFF"),
                                 ),
+
                               ],
                             ),
                           ),
                         ),
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            width: 100,
+                            height: 40,
+                            decoration: BoxDecoration(border:Border.all(width: 1,color: Colors.black)),
+                            child: TextField(
+                              style: TextStyle(backgroundColor: Colors.tealAccent),
+                              decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Enter a search term'
+                              ),
+                              onChanged: (value){
+                                onText=value;
+                              },
+                            ),
+                          ),
+                          FlatButton(
+                            onPressed: _connected
+                                ? (){
+                              _sendOnMessageToBluetooth(onText);
+                            }
+                                : null,
+                            child: Text("Send Text"),
+                          ),
+                        ],
+                      )
                     ],
                   ),
                   Container(
@@ -465,8 +496,8 @@ class _BluetoothAppState extends State<BluetoothApp> {
 
   // Method to send message,
   // for turning the Bluetooth device on
-  void _sendOnMessageToBluetooth() async {
-    connection.output.add(utf8.encode("1" + "\r\n"));
+  void _sendOnMessageToBluetooth(onText) async {
+    connection.output.add(utf8.encode("$onText" + "\r\n"));
     await connection.output.allSent;
     show('Device Turned On');
     setState(() {
